@@ -82,6 +82,12 @@ CameraNode::CameraNode(const rclcpp::NodeOptions &options) : Node("camera", opti
   param_descr_format.read_only = true;
   declare_parameter<std::string>("format", {}, param_descr_format);
 
+  // image dimensions
+  rcl_interfaces::msg::ParameterDescriptor param_descr_ro;
+  param_descr_ro.read_only = true;
+  declare_parameter<int64_t>("width", {}, param_descr_ro);
+  declare_parameter<int64_t>("height", {}, param_descr_ro);
+
   // publisher for raw and compressed image
   pub_image = this->create_publisher<sensor_msgs::msg::Image>("~/image_raw", 1);
   pub_image_compressed =
@@ -145,6 +151,14 @@ CameraNode::CameraNode(const rclcpp::NodeOptions &options) : Node("camera", opti
     // get pixel format from provided string
     scfg.pixelFormat = libcamera::PixelFormat::fromString(format);
   }
+
+  int64_t width = 0, height = 0;
+  get_parameter("width", width);
+  get_parameter("height", height);
+  if (width)
+    scfg.size.width = width;
+  if (height)
+    scfg.size.height = height;
 
   switch (cfg->validate()) {
   case libcamera::CameraConfiguration::Valid:
