@@ -24,6 +24,7 @@ add_library(utils STATIC
   src/cast_cv.cpp
   src/clamp.cpp
   src/cv_to_pv.cpp
+  src/exceptions.cpp
   src/pv_to_cv.cpp
   src/types.cpp
   src/type_extent.cpp

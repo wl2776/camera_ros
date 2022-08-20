@@ -1,5 +1,6 @@
 #include "cast_cv.hpp"
 #include "casts.hpp"
+#include "exceptions.hpp"
 
 
 #define CASE_CAST_CONV1(F)                                                                         \
@@ -71,7 +72,7 @@ template<typename F, typename T,
 libcamera::ControlValue
 cast_cv(const libcamera::ControlValue & /*value*/)
 {
-  throw std::runtime_error("unsupported ControlValue cast");
+  throw invalid_cast(typeid(F), typeid(T));
 }
 
 template<typename T>

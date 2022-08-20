@@ -1,6 +1,7 @@
 #include "cast_cv.hpp"
 #include "clamp.hpp"
 #include "cv_to_pv.hpp"
+#include "exceptions.hpp"
 #include "pv_to_cv.hpp"
 #include "type_extent.hpp"
 #include "types.hpp"
@@ -369,7 +370,20 @@ CameraNode::declareParameters()
     }
 
     // cast all ControlValue to the type provided by the ControlId
-    const libcamera::ControlValue val_def = cast_cv(info.def(), id->type());
+    std::cout << "converting " << id->name() << " from " << info.def().type() << " / "
+              << info.min().type() << " / " << info.max().type() << " to " << id->type()
+              << std::endl;
+
+    libcamera::ControlValue val_def;
+    try {
+      val_def = cast_cv(info.def(), id->type());
+    }
+    catch (const invalid_cast &e) {
+      // fallback to original type
+      RCLCPP_WARN_STREAM(get_logger(),
+                         "ignoring " << e.what() << " for control value '" << id->name() << "'");
+      val_def = info.def();
+    }
     const libcamera::ControlValue val_min = cast_cv(info.min(), id->type());
     const libcamera::ControlValue val_max = cast_cv(info.max(), id->type());
 
