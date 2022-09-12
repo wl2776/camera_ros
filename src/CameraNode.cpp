@@ -1,3 +1,4 @@
+#include "cast_cv.hpp"
 #include "clamp.hpp"
 #include "cv_to_pv.hpp"
 #include "pv_to_cv.hpp"
@@ -367,6 +368,11 @@ CameraNode::declareParameters()
       continue;
     }
 
+    // cast all ControlValue to the type provided by the ControlId
+    const libcamera::ControlValue val_def = cast_cv(info.def(), id->type());
+    const libcamera::ControlValue val_min = cast_cv(info.min(), id->type());
+    const libcamera::ControlValue val_max = cast_cv(info.max(), id->type());
+
     // format type description
     const std::string cv_descr =
       std::to_string(id->type()) + " " +
@@ -374,12 +380,11 @@ CameraNode::declareParameters()
       info.min().toString() + "}..{" + info.max().toString() + "} (default: {" +
       info.def().toString() + "})";
 
-    if (info.min().numElements() != info.max().numElements())
+    if (val_min.numElements() != val_max.numElements())
       throw std::runtime_error("minimum and maximum parameter array sizes do not match");
 
     // clamp default ControlValue to min/max range and cast ParameterValue
-    const rclcpp::ParameterValue value =
-      cv_to_pv(clamp(info.def(), info.min(), info.max()), extent);
+    const rclcpp::ParameterValue value = cv_to_pv(clamp(val_def, val_min, val_max), extent);
 
     // get smallest bounds for minimum and maximum set
     rcl_interfaces::msg::IntegerRange range_int;
@@ -387,16 +392,16 @@ CameraNode::declareParameters()
 
     switch (id->type()) {
     case libcamera::ControlTypeInteger32:
-      range_int.from_value = max<ControlTypeMap<libcamera::ControlTypeInteger32>::type>(info.min());
-      range_int.to_value = min<ControlTypeMap<libcamera::ControlTypeInteger32>::type>(info.max());
+      range_int.from_value = max<ControlTypeMap<libcamera::ControlTypeInteger32>::type>(val_min);
+      range_int.to_value = min<ControlTypeMap<libcamera::ControlTypeInteger32>::type>(val_max);
       break;
     case libcamera::ControlTypeInteger64:
-      range_int.from_value = max<ControlTypeMap<libcamera::ControlTypeInteger64>::type>(info.min());
-      range_int.to_value = min<ControlTypeMap<libcamera::ControlTypeInteger64>::type>(info.max());
+      range_int.from_value = max<ControlTypeMap<libcamera::ControlTypeInteger64>::type>(val_min);
+      range_int.to_value = min<ControlTypeMap<libcamera::ControlTypeInteger64>::type>(val_max);
       break;
     case libcamera::ControlTypeFloat:
-      range_float.from_value = max<ControlTypeMap<libcamera::ControlTypeFloat>::type>(info.min());
-      range_float.to_value = min<ControlTypeMap<libcamera::ControlTypeFloat>::type>(info.max());
+      range_float.from_value = max<ControlTypeMap<libcamera::ControlTypeFloat>::type>(val_min);
+      range_float.to_value = min<ControlTypeMap<libcamera::ControlTypeFloat>::type>(val_max);
       break;
     default:
       break;
