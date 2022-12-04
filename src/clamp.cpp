@@ -1,5 +1,6 @@
 #include "types.hpp"
 #include <libcamera/controls.h>
+#include <vector>
 
 
 #define CASE_CLAMP(T)                                                                              \
