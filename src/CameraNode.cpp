@@ -554,6 +554,8 @@ CameraNode::requestComplete(libcamera::Request *request)
       mem.data =
         mmap(NULL, mem.size, PROT_READ | PROT_WRITE, MAP_SHARED, buffer->planes()[i].fd.get(), 0);
       buffers.push_back(mem);
+      RCLCPP_DEBUG_STREAM(get_logger(), "frame " << metadata.sequence << ", buffer " << i << ", "
+                                                 << mem.size << " bytes");
       if (mem.data == MAP_FAILED)
         std::cerr << "mmap failed: " << std::strerror(errno) << std::endl;
     }
