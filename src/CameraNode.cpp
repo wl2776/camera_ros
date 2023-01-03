@@ -556,6 +556,9 @@ CameraNode::requestComplete(libcamera::Request *request)
       buffers.push_back(mem);
       RCLCPP_DEBUG_STREAM(get_logger(), "frame " << metadata.sequence << ", buffer " << i << ", "
                                                  << mem.size << " bytes");
+      RCLCPP_DEBUG_STREAM(get_logger(), "frame " << metadata.sequence << ", buffer " << i << ", @ "
+                                                 << buffer->planes()[i].offset << " + "
+                                                 << buffer->planes()[i].length << " bytes");
       if (mem.data == MAP_FAILED)
         std::cerr << "mmap failed: " << std::strerror(errno) << std::endl;
     }
@@ -565,6 +568,11 @@ CameraNode::requestComplete(libcamera::Request *request)
     hdr.stamp = rclcpp::Time(time_offset + int64_t(metadata.timestamp));
     hdr.frame_id = "camera";
     const libcamera::StreamConfiguration &cfg = stream->configuration();
+
+    RCLCPP_DEBUG_STREAM(get_logger(), "cfg " << cfg.size.width << " x " << cfg.size.height
+                                             << " (stride: " << cfg.stride << "), "
+                                             << "buffer: " << cfg.bufferCount
+                                             << ", frame size: " << cfg.frameSize);
 
     if (map_format_raw.count(cfg.pixelFormat.fourcc())) {
       // raw uncompressed image
