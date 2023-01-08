@@ -524,7 +524,12 @@ CameraNode::requestComplete(libcamera::Request *request)
 
       // compress to jpeg
       if (pub_image_compressed->get_subscription_count())
-        cv_bridge::toCvCopy(*msg_img)->toCompressedImageMsg(*msg_img_compressed);
+        try {
+          cv_bridge::toCvCopy(*msg_img)->toCompressedImageMsg(*msg_img_compressed);
+        }
+        catch (const cv_bridge::Exception &e) {
+          RCLCPP_WARN_STREAM(get_logger(), e.what());
+        }
     }
     else if (format_type(cfg.pixelFormat) == FormatType::COMPRESSED) {
       // compressed image
