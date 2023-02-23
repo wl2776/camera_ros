@@ -1,0 +1,11 @@
+#cmakedefine01 HAVE_AF_MODE
+#cmakedefine01 HAVE_AF_RANGE
+#cmakedefine01 HAVE_AF_SPEED
+#cmakedefine01 HAVE_AF_METERING
+#cmakedefine01 HAVE_AF_WINDOWS
+#cmakedefine01 HAVE_AF_TRIGGER
+#cmakedefine01 HAVE_AF_PAUSE
+#cmakedefine01 HAVE_LENS_POSITION
+#cmakedefine01 HAVE_AF_STATE
+#cmakedefine01 HAVE_AF_PAUSE_STATE
+
