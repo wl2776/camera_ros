@@ -17,7 +17,7 @@
 #include <cv_bridge/cv_bridge.h>
 #include <functional>
 #include <iostream>
-#include <libcamera/base/shared_fd.h>
+//#include <libcamera/base/shared_fd.h>
 #include <libcamera/base/signal.h>
 #include <libcamera/base/span.h>
 #include <libcamera/camera.h>
@@ -270,7 +270,7 @@ CameraNode::CameraNode(const rclcpp::NodeOptions &options) : Node("camera", opti
     RCLCPP_INFO_STREAM(get_logger(), scfg);
     scfg.size = scfg.formats().sizes(scfg.pixelFormat).back();
     RCLCPP_WARN_STREAM(get_logger(),
-                       "no dimensions selected, auto-selecting: \"" << scfg.size << "\"");
+                       "no dimensions selected, auto-selecting: \"" << scfg.size.width << "x" << scfg.size.height << "\"");
   }
   else {
     scfg.size = size;
@@ -346,8 +346,8 @@ CameraNode::CameraNode(const rclcpp::NodeOptions &options) : Node("camera", opti
       if (!plane.fd.isValid())
         throw std::runtime_error("file descriptor is not valid");
       if (fd == -1)
-        fd = plane.fd.get();
-      else if (fd != plane.fd.get())
+        fd = plane.fd.fd();
+      else if (fd != plane.fd.fd())
         throw std::runtime_error("plane file descriptors differ");
     }
 
